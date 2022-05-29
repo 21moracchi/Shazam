@@ -86,18 +86,10 @@ class Encoding:
         self.spectogram = spectrogram(
             self.s, self.fs, noverlap=self.noverlap, nperseg=self.nperseg)
         f, t, Sxx = self.spectogram
-        #self.energy = np.sum(Sxx)
-        #Sxx_sorted = np.sort(Sxx)
-        #somme = 0
-        # for elem in Sxx_sorted :
-        #somme += elem
-        # if somme > self.energy:
-        # pass #à compléter
 
         coords = peak_local_max(Sxx, exclude_border=False, min_distance=min)
         self.coords = np.array(
             [np.array([t[coord[1]], f[coord[0]]]) for coord in coords])
-        print(len(coords))
 
         signature = list()
         delta_t = 2  # 1 ou 2 secondes
@@ -111,6 +103,24 @@ class Encoding:
         self.signature = signature
 
         # Insert code here
+    def nb_min_coeff(self):
+        """
+        Return the number of coefficients that contain 90% of signal energy
+        """
+        Sxx = self.spectogram[2]
+
+        Sxx_sorted = np.sort(Sxx, axis=None)
+        self.energy = np.sum(Sxx_sorted)
+
+        somme = 0
+        nb_coeff = 0
+        for elem in Sxx_sorted[::-1]:
+            somme += elem
+            nb_coeff += 1
+            if somme > self.energy*0.9:
+                print(
+                    f"Il suffit de {nb_coeff} coefficients sur {len(Sxx_sorted)} (soit {nb_coeff/len(Sxx_sorted)}) pour obtenir 90% de l'énergie")
+                break
 
     def display_spectrogram(self):
         """
@@ -223,20 +233,21 @@ class Matching:
         """
         Display the offset histogram
         """
-        plt.hist(self.difference, bins = 100 )
+        plt.hist(self.difference, bins=100)
         plt.show()
+
     def does_it_match(self):
-        ys, xs, z = plt.hist(self.difference, bins = 100)
+        ys, xs, z = plt.hist(self.difference, bins=100)
         first_peak = 0
         second_peak = 0
         for peak in ys:
             if peak > first_peak:
                 second_peak = first_peak
                 first_peak = peak
-
             elif peak > second_peak:
                 second_peak = peak
-        if first_peak > 3 * second_peak and len(self.time_1) > 10 :
+
+        if first_peak > 3 * second_peak and len(self.time_1) > 10:
             return True
         else:
             return False
@@ -247,23 +258,13 @@ class Matching:
 # ----------------------------------------------
 if __name__ == '__main__':
 
-    encoder = Encoding(64, 32)
-    encoder_2 = Encoding(64, 32)
+    encoder = Encoding(128, 120)
+    encoder_2 = Encoding(128, 120)
 
-    #fs, s = read('samples/Dark Alley Deals - Aaron Kenny.wav')
-    #fs, s = read('samples/Jal - Edge of Water - Aakash Gandhi.wav')
-    fs, s = read('samples/Cash Machine - Anno Domini Beats.wav')
+    fs, s = read('samples/Dark Alley Deals - Aaron Kenny.wav')
     encoder.process(fs, s)
 
-    #fs, s = read('samples/Dark Alley Deals - Aaron Kenny.wav')
-    #fs, s = read('samples/Jal - Edge of Water - Aakash Gandhi.wav')
     encoder_2.process(fs, s[50*fs: 60*fs])
-    # encoder_2.display_spectrogram()
 
     matching = Matching(encoder.signature, encoder_2.signature)
-    matching.display_scatterplot()
-    plt.show()
     matching.display_histogram()
-    plt.show()
-    print(matching.does_it_match())
-    # encoder.display_spectrogram(display_anchors=True)

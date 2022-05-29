@@ -39,9 +39,11 @@ if __name__ == '__main__':
     # 5: Using the class Matching, compare the fingerprint to all the
     # fingerprints in the database
     for song in database:
-        print(song['song'])
+        
         matching = Matching(song['signature'], hashes)
 
-        matching.display_histogram()
-        print(matching.does_it_match())
-    # Insert code here
+        if matching.does_it_match():
+            print( f"Le morceau reconnu est {song['song']} ")
+            break
+        
+
