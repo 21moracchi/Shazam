@@ -19,7 +19,7 @@ if __name__ == '__main__':
         database = pickle.load(handle)
 
     # 2: Create an instance of the class Encoder
-    encoder = Encoding(256, 200)
+    encoder = Encoding(128, 120)
 
     # 3: Randomly get an extract from one of the songs of the database
     songs = [item for item in os.listdir('./samples') if item[:-4] != '.wav']
