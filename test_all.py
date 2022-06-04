@@ -40,4 +40,4 @@ if __name__ == '__main__':
         # si tous les extraits ont été identifiés, on a réussi le test
         return "Le test a été réussi"
 
-    print(test_all(40, 20))
+    print(test_all(40, 10))
