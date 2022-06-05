@@ -1,6 +1,6 @@
 README.md
 ========================================
-
+Projet de David Jung et de Léonard Moracchini
 
 Organisation des données
 ------------------------
